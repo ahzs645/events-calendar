@@ -414,9 +414,10 @@ const MobileMonthView = ({ events }: { events: Event[] }) => {
 };
 
 // Custom Month View Component - mimics original Mina scheduler layout
-const CustomMonthView = ({ events }: { events: Event[] }) => {
+const CustomMonthView = ({ events, onDateClick }: { events: Event[]; onDateClick?: (date: Date) => void }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState<number>(0);
+  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
   const getDaysInMonth = (month: number, year: number) => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -429,6 +430,14 @@ const CustomMonthView = ({ events }: { events: Event[] }) => {
       return eventDate.getDate() === day && 
              eventDate.getMonth() === currentDate.getMonth() && 
              eventDate.getFullYear() === currentDate.getFullYear();
+    });
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
     });
   };
 
@@ -547,22 +556,31 @@ const CustomMonthView = ({ events }: { events: Event[] }) => {
             </div>
           ))}
 
-          {daysInMonth.map((dayObj) => {
+          {daysInMonth.map((dayObj, index) => {
             const dayEvents = getEventsForDay(dayObj.day, currentDate);
             const isToday = new Date().getDate() === dayObj.day &&
               new Date().getMonth() === currentDate.getMonth() &&
               new Date().getFullYear() === currentDate.getFullYear();
+            
+            // Calculate if tooltip should be positioned differently
+            const dayOfWeek = (startOffset + dayObj.day - 1) % 7;
+            const isRightEdge = dayOfWeek >= 5; // Friday (5) or Saturday (6)
 
             return (
               <motion.div
-                className="hover:z-50 border-none h-[150px] rounded group flex flex-col"
+                className="hover:z-50 border-none h-[150px] rounded group flex flex-col relative"
                 key={dayObj.day}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
+                onMouseEnter={() => setHoveredDay(dayObj.day)}
+                onMouseLeave={() => setHoveredDay(null)}
               >
-                <Card className="shadow-md overflow-hidden relative flex p-4 border h-full">
+                <Card 
+                  className="shadow-md overflow-hidden relative flex p-4 border h-full cursor-pointer hover:shadow-lg transition-shadow day-card"
+                  onClick={() => onDateClick?.(new Date(currentDate.getFullYear(), currentDate.getMonth(), dayObj.day))}
+                >
                   <div className={`font-semibold relative text-3xl mb-1 ${
                     dayEvents.length > 0 ? "text-black" : "text-gray-500"
                   } ${isToday ? "text-secondary-500" : ""}`}>
@@ -584,6 +602,47 @@ const CustomMonthView = ({ events }: { events: Event[] }) => {
                     </AnimatePresence>
                   </div>
                 </Card>
+                
+                {/* Hover Tooltip */}
+                {hoveredDay === dayObj.day && dayEvents.length > 0 && (
+                  <div className={`absolute top-full mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 w-80 ${
+                    isRightEdge ? 'right-0' : 'left-0'
+                  }`}>
+                    <div className="text-sm font-semibold text-gray-900 mb-2">
+                      {dayEvents.length} event{dayEvents.length > 1 ? 's' : ''}
+                    </div>
+                    <div className="space-y-2">
+                      {dayEvents.map((event) => {
+                        const metadata = eventMetadata[event.id];
+                        const categoryColors = {
+                          academic: "bg-green-500",
+                          social: "bg-orange-500",
+                          cultural: "bg-purple-500",
+                          sports: "bg-red-500",
+                          professional: "bg-teal-500",
+                          wellness: "bg-blue-500",
+                          volunteer: "bg-yellow-500",
+                          arts: "bg-pink-500"
+                        };
+                        const colorClass = metadata ? categoryColors[metadata.category as keyof typeof categoryColors] : "bg-gray-500";
+                        
+                        return (
+                          <div key={event.id} className="flex items-start gap-2">
+                            <div className={`w-2 h-2 rounded-full ${colorClass} flex-shrink-0 mt-1.5`}></div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-gray-800 leading-tight">
+                                {event.title}
+                              </div>
+                              <div className="text-xs text-gray-600 mt-0.5">
+                                {formatTime(event.startDate)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             );
           })}
@@ -1088,8 +1147,14 @@ const WeekView = ({ events }: { events: Event[] }) => {
 };
 
 // Day View Component  
-const DayView = ({ events }: { events: Event[] }) => {
-  const [currentDate, setCurrentDate] = React.useState(new Date());
+const DayView = ({ events, initialDate }: { events: Event[]; initialDate?: Date }) => {
+  const [currentDate, setCurrentDate] = React.useState(initialDate || new Date());
+  
+  React.useEffect(() => {
+    if (initialDate) {
+      setCurrentDate(initialDate);
+    }
+  }, [initialDate]);
   
   const hours = Array.from({ length: 24 }, (_, i) => i);
   
@@ -1252,6 +1317,9 @@ const DayView = ({ events }: { events: Event[] }) => {
 
 // Main UNBC Calendar Component
 export default function UNBCCalendar() {
+  const [activeTab, setActiveTab] = useState("month");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  
   // Minimal CSS for view-only calendar
   React.useEffect(() => {
     const style = document.createElement('style');
@@ -1261,8 +1329,8 @@ export default function UNBCCalendar() {
         display: none !important;
       }
       
-      /* Disable click events on calendar cells but not on buttons */
-      .unbc-calendar-view [role="tabpanel"] .cursor-pointer:not(button):not(.mobile-calendar button) {
+      /* Disable click events on calendar cells but not on buttons or day cards */
+      .unbc-calendar-view [role="tabpanel"] .cursor-pointer:not(button):not(.mobile-calendar button):not(.day-card) {
         cursor: default !important;
         pointer-events: none !important;
       }
@@ -1274,10 +1342,10 @@ export default function UNBCCalendar() {
         cursor: pointer !important;
       }
       
-      /* Ensure card clicks are disabled */
-      .unbc-calendar-view .shadow-md.cursor-pointer {
-        cursor: default !important;
-        pointer-events: none !important;
+      /* Ensure day cards are clickable */
+      .unbc-calendar-view .day-card {
+        pointer-events: auto !important;
+        cursor: pointer !important;
       }
     `;
     document.head.appendChild(style);
@@ -1291,6 +1359,11 @@ export default function UNBCCalendar() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [organizationFilter, setOrganizationFilter] = useState<string>("all");
   const [searchFilter, setSearchFilter] = useState<string>("");
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    setActiveTab("day");
+  };
 
   // Filter events based on current filters
   const applyFilters = () => {
@@ -1343,23 +1416,23 @@ export default function UNBCCalendar() {
 
       {/* Calendar Views */}
       <div className="bg-white rounded-lg border shadow-sm unbc-calendar-view">
-        <Tabs defaultValue="month" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop: Tabs and Filters inline */}
           <div className="hidden md:flex p-6 pb-0 justify-between items-start gap-6">
-            <TabsList className="h-9">
-              <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1">
+            <TabsList className="h-9 bg-gray-100 p-1">
+              <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 <CalendarDays className="h-3 w-3" />
                 Day
               </TabsTrigger>
-              <TabsTrigger value="week" className="text-xs px-3 py-1 flex items-center gap-1">
+              <TabsTrigger value="week" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 <CalendarDays className="h-3 w-3" />
                 Week
               </TabsTrigger>
-              <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1">
+              <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 <CalendarDays className="h-3 w-3" />
                 Month
               </TabsTrigger>
-              <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1">
+              <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 <List className="h-3 w-3" />
                 List
               </TabsTrigger>
@@ -1410,16 +1483,16 @@ export default function UNBCCalendar() {
           {/* Mobile: Tabs and Filters stacked */}
           <div className="md:hidden">
             <div className="p-6 pb-0 flex justify-center">
-              <TabsList className="h-9">
-                <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1">
+              <TabsList className="h-9 bg-gray-100 p-1">
+                <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <CalendarDays className="h-3 w-3" />
                   Day
                 </TabsTrigger>
-                <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1">
+                <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <CalendarDays className="h-3 w-3" />
                   Month
                 </TabsTrigger>
-                <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1">
+                <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <List className="h-3 w-3" />
                   List
                 </TabsTrigger>
@@ -1469,7 +1542,7 @@ export default function UNBCCalendar() {
 
           <TabsContent value="month" className="p-6 pt-4">
             <div className="hidden md:block">
-              <CustomMonthView events={filteredEvents} />
+              <CustomMonthView events={filteredEvents} onDateClick={handleDateClick} />
             </div>
             <div className="block md:hidden mobile-calendar">
               <MobileMonthView events={filteredEvents} />
@@ -1481,7 +1554,7 @@ export default function UNBCCalendar() {
           </TabsContent>
 
           <TabsContent value="day" className="p-6 pt-4">
-            <DayView events={filteredEvents} />
+            <DayView events={filteredEvents} initialDate={selectedDate} />
           </TabsContent>
 
           <TabsContent value="list" className="p-6 pt-4">
