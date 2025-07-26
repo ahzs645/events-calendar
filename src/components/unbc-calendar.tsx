@@ -564,7 +564,7 @@ const CustomMonthView = ({ events }: { events: Event[] }) => {
               >
                 <Card className="shadow-md overflow-hidden relative flex p-4 border h-full">
                   <div className={`font-semibold relative text-3xl mb-1 ${
-                    dayEvents.length > 0 ? "text-primary-600" : "text-muted-foreground"
+                    dayEvents.length > 0 ? "text-black" : "text-gray-500"
                   } ${isToday ? "text-secondary-500" : ""}`}>
                     {dayObj.day}
                   </div>
