@@ -71,14 +71,14 @@ export function DayView({ events, eventMetadata, initialDate, onEventClick }: Da
   const dayEvents = getEventsForDay();
 
   const categoryColors = {
-    academic: "bg-green-100 text-green-800 border-green-200",
-    social: "bg-orange-100 text-orange-800 border-orange-200",
-    cultural: "bg-purple-100 text-purple-800 border-purple-200",
-    sports: "bg-red-100 text-red-800 border-red-200",
-    professional: "bg-teal-100 text-teal-800 border-teal-200",
-    wellness: "bg-blue-100 text-blue-800 border-blue-200",
-    volunteer: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    arts: "bg-pink-100 text-pink-800 border-pink-200"
+    academic: "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 border-green-200 dark:border-green-700",
+    social: "bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-100 border-orange-200 dark:border-orange-700",
+    cultural: "bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-100 border-purple-200 dark:border-purple-700",
+    sports: "bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100 border-red-200 dark:border-red-700",
+    professional: "bg-teal-100 dark:bg-teal-800 text-teal-800 dark:text-teal-100 border-teal-200 dark:border-teal-700",
+    wellness: "bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 border-blue-200 dark:border-blue-700",
+    volunteer: "bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100 border-yellow-200 dark:border-yellow-700",
+    arts: "bg-pink-100 dark:bg-pink-800 text-pink-800 dark:text-pink-100 border-pink-200 dark:border-pink-700"
   };
 
   return (
@@ -87,11 +87,11 @@ export function DayView({ events, eventMetadata, initialDate, onEventClick }: Da
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigateDay('prev')}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-300"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {currentDate.toLocaleDateString('en-US', { 
             weekday: 'long', 
             month: 'long', 
@@ -101,19 +101,19 @@ export function DayView({ events, eventMetadata, initialDate, onEventClick }: Da
         </h2>
         <button
           onClick={() => navigateDay('next')}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-300"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
       {/* Day Schedule */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="flex">
           {/* Time column */}
-          <div className="w-20 border-r bg-gray-50">
+          <div className="w-20 border-r border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
             {hours.map((hour) => (
-              <div key={hour} className="h-[80px] p-3 text-sm text-gray-500 border-b flex items-start">
+              <div key={hour} className="h-[80px] p-3 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600 flex items-start">
                 {hour === 0 ? '12 AM' : hour === 12 ? '12 PM' : hour > 12 ? `${hour - 12} PM` : `${hour} AM`}
               </div>
             ))}
@@ -123,13 +123,13 @@ export function DayView({ events, eventMetadata, initialDate, onEventClick }: Da
           <div className="flex-1 relative">
             {/* Hour grid lines */}
             {hours.map((hour) => (
-              <div key={hour} className="h-[80px] border-b"></div>
+              <div key={hour} className="h-[80px] border-b border-gray-200 dark:border-gray-600"></div>
             ))}
             
             {/* Events positioned absolutely */}
             {dayEvents.map((event, eventIndex) => {
               const metadata = eventMetadata[event.id];
-              const colorClass = metadata ? categoryColors[metadata.category as keyof typeof categoryColors] : "bg-gray-100 text-gray-800 border-gray-200";
+              const colorClass = metadata ? categoryColors[metadata.category as keyof typeof categoryColors] : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-600";
               const position = getEventPosition(event, dayEvents, eventIndex);
               
               return (

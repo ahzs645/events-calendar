@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, List } from "lucide-react";
+import { CalendarDays, List, Moon, Sun } from "lucide-react";
 import type { Event } from "@/types";
 import { unbcEvents, eventMetadata } from "@/data/events";
 import { EventDialog } from "@/components/event-dialog";
@@ -74,6 +74,7 @@ export default function UNBCCalendar() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [organizationFilter, setOrganizationFilter] = useState<string>("all");
   const [searchFilter, setSearchFilter] = useState<string>("");
+  const [darkMode, setDarkMode] = useState<boolean>(false);
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
@@ -84,6 +85,21 @@ export default function UNBCCalendar() {
     setSelectedEvent(event);
     setShowEventDialog(true);
   };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Apply dark mode to document body
+  React.useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+      document.body.style.backgroundColor = '#1f2937'; // gray-800
+    } else {
+      document.body.classList.remove('dark');
+      document.body.style.backgroundColor = '';
+    }
+  }, [darkMode]);
 
   // Filter events based on current filters
   const applyFilters = () => {
@@ -120,13 +136,26 @@ export default function UNBCCalendar() {
   }, [categoryFilter, organizationFilter, searchFilter]);
 
   return (
-    <div className="w-full space-y-6">
+    <div className={`w-full space-y-6 ${darkMode ? 'dark' : ''}`}>
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-2">
+      <div className="text-center relative">
+        <div className="absolute top-0 right-0">
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? (
+              <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            )}
+          </button>
+        </div>
+        <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-2">
           🗓️ UNBC Campus Events
         </h1>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 dark:text-gray-400 text-lg">
           Discover what's happening at UNBC - from academic workshops to social gatherings, all in one place
         </p>
       </div>
@@ -135,24 +164,24 @@ export default function UNBCCalendar() {
       <EventStats events={filteredEvents} eventMetadata={eventMetadata} />
 
       {/* Calendar Views */}
-      <div className="bg-white rounded-lg border shadow-sm unbc-calendar-view">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm unbc-calendar-view">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop: Tabs and Filters inline */}
           <div className="hidden md:flex p-6 pb-0 justify-between items-start gap-6">
-            <TabsList className="h-9 bg-gray-100 p-1">
-              <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsList className="h-9 bg-gray-100 dark:bg-gray-700 p-1">
+              <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                 <CalendarDays className="h-3 w-3" />
                 Day
               </TabsTrigger>
-              <TabsTrigger value="week" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="week" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                 <CalendarDays className="h-3 w-3" />
                 Week
               </TabsTrigger>
-              <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                 <CalendarDays className="h-3 w-3" />
                 Month
               </TabsTrigger>
-              <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                 <List className="h-3 w-3" />
                 List
               </TabsTrigger>
@@ -161,41 +190,41 @@ export default function UNBCCalendar() {
             {/* Desktop Filters - Inline */}
             <div className="flex items-center gap-3">
               <Select onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="academic">Academic</SelectItem>
-                  <SelectItem value="arts">Arts & Creative</SelectItem>
-                  <SelectItem value="cultural">Cultural</SelectItem>
-                  <SelectItem value="professional">Professional</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="sports">Sports & Recreation</SelectItem>
-                  <SelectItem value="volunteer">Volunteer</SelectItem>
-                  <SelectItem value="wellness">Health & Wellness</SelectItem>
+                <SelectContent className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+                  <SelectItem value="all" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">All Categories</SelectItem>
+                  <SelectItem value="academic" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Academic</SelectItem>
+                  <SelectItem value="arts" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Arts & Creative</SelectItem>
+                  <SelectItem value="cultural" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Cultural</SelectItem>
+                  <SelectItem value="professional" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Professional</SelectItem>
+                  <SelectItem value="social" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Social</SelectItem>
+                  <SelectItem value="sports" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Sports & Recreation</SelectItem>
+                  <SelectItem value="volunteer" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Volunteer</SelectItem>
+                  <SelectItem value="wellness" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Health & Wellness</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select onValueChange={setOrganizationFilter}>
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-44 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                   <SelectValue placeholder="All Organizations" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Organizations</SelectItem>
-                  <SelectItem value="student-union">UNBC Student Union</SelectItem>
-                  <SelectItem value="outdoor-club">UNBC Outdoor Club</SelectItem>
-                  <SelectItem value="business-club">Business Students Association</SelectItem>
-                  <SelectItem value="international">International Students Club</SelectItem>
-                  <SelectItem value="sustainability">Sustainability Office</SelectItem>
-                  <SelectItem value="health-wellness">Student Health & Wellness</SelectItem>
+                <SelectContent className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+                  <SelectItem value="all" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">All Organizations</SelectItem>
+                  <SelectItem value="student-union" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">UNBC Student Union</SelectItem>
+                  <SelectItem value="outdoor-club" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">UNBC Outdoor Club</SelectItem>
+                  <SelectItem value="business-club" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Business Students Association</SelectItem>
+                  <SelectItem value="international" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">International Students Club</SelectItem>
+                  <SelectItem value="sustainability" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Sustainability Office</SelectItem>
+                  <SelectItem value="health-wellness" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Student Health & Wellness</SelectItem>
                 </SelectContent>
               </Select>
 
               <Input
                 placeholder="Search events..."
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-40"
+                className="w-40 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -203,16 +232,16 @@ export default function UNBCCalendar() {
           {/* Mobile: Tabs and Filters stacked */}
           <div className="md:hidden">
             <div className="p-6 pb-0 flex justify-center">
-              <TabsList className="h-9 bg-gray-100 p-1">
-                <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsList className="h-9 bg-gray-100 dark:bg-gray-700 p-1">
+                <TabsTrigger value="day" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                   <CalendarDays className="h-3 w-3" />
                   Day
                 </TabsTrigger>
-                <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="month" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                   <CalendarDays className="h-3 w-3" />
                   Month
                 </TabsTrigger>
-                <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="list" className="text-xs px-3 py-1 flex items-center gap-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600 data-[state=active]:shadow-sm dark:text-gray-300">
                   <List className="h-3 w-3" />
                   List
                 </TabsTrigger>
@@ -222,40 +251,41 @@ export default function UNBCCalendar() {
             {/* Mobile Filters - Stacked */}
             <div className="p-6 pt-4 space-y-3">
               <Select onValueChange={setCategoryFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="academic">Academic</SelectItem>
-                  <SelectItem value="arts">Arts & Creative</SelectItem>
-                  <SelectItem value="cultural">Cultural</SelectItem>
-                  <SelectItem value="professional">Professional</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="sports">Sports & Recreation</SelectItem>
-                  <SelectItem value="volunteer">Volunteer</SelectItem>
-                  <SelectItem value="wellness">Health & Wellness</SelectItem>
+                <SelectContent className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+                  <SelectItem value="all" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">All Categories</SelectItem>
+                  <SelectItem value="academic" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Academic</SelectItem>
+                  <SelectItem value="arts" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Arts & Creative</SelectItem>
+                  <SelectItem value="cultural" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Cultural</SelectItem>
+                  <SelectItem value="professional" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Professional</SelectItem>
+                  <SelectItem value="social" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Social</SelectItem>
+                  <SelectItem value="sports" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Sports & Recreation</SelectItem>
+                  <SelectItem value="volunteer" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Volunteer</SelectItem>
+                  <SelectItem value="wellness" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Health & Wellness</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select onValueChange={setOrganizationFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                   <SelectValue placeholder="All Organizations" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Organizations</SelectItem>
-                  <SelectItem value="student-union">UNBC Student Union</SelectItem>
-                  <SelectItem value="outdoor-club">UNBC Outdoor Club</SelectItem>
-                  <SelectItem value="business-club">Business Students Association</SelectItem>
-                  <SelectItem value="international">International Students Club</SelectItem>
-                  <SelectItem value="sustainability">Sustainability Office</SelectItem>
-                  <SelectItem value="health-wellness">Student Health & Wellness</SelectItem>
+                <SelectContent className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+                  <SelectItem value="all" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">All Organizations</SelectItem>
+                  <SelectItem value="student-union" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">UNBC Student Union</SelectItem>
+                  <SelectItem value="outdoor-club" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">UNBC Outdoor Club</SelectItem>
+                  <SelectItem value="business-club" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Business Students Association</SelectItem>
+                  <SelectItem value="international" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">International Students Club</SelectItem>
+                  <SelectItem value="sustainability" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Sustainability Office</SelectItem>
+                  <SelectItem value="health-wellness" className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-600">Student Health & Wellness</SelectItem>
                 </SelectContent>
               </Select>
 
               <Input
                 placeholder="Search events..."
                 onChange={(e) => setSearchFilter(e.target.value)}
+                className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -270,7 +300,11 @@ export default function UNBCCalendar() {
               />
             </div>
             <div className="block md:hidden mobile-calendar">
-              <MobileMonthView events={filteredEvents} eventMetadata={eventMetadata} />
+              <MobileMonthView 
+                events={filteredEvents} 
+                eventMetadata={eventMetadata} 
+                onEventClick={handleEventClick}
+              />
             </div>
           </TabsContent>
 
@@ -293,19 +327,19 @@ export default function UNBCCalendar() {
 
           <TabsContent value="list" className="p-6 pt-4">
             <div className="hidden md:block">
-              <EventListView events={filteredEvents} eventMetadata={eventMetadata} />
+              <EventListView events={filteredEvents} eventMetadata={eventMetadata} onEventClick={handleEventClick} />
             </div>
             <div className="block md:hidden">
-              <MobileListView events={filteredEvents} eventMetadata={eventMetadata} />
+              <MobileListView events={filteredEvents} eventMetadata={eventMetadata} onEventClick={handleEventClick} />
             </div>
           </TabsContent>
         </Tabs>
       </div>
 
       {/* Legend */}
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-lg">Event Categories</CardTitle>
+          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Event Categories</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -330,7 +364,7 @@ export default function UNBCCalendar() {
                   key === 'volunteer' ? 'bg-yellow-500' :
                   'bg-pink-500'
                 }`}></div>
-                <span className="text-sm text-gray-700">{label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
               </div>
             ))}
           </div>

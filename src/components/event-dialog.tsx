@@ -84,10 +84,10 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle className="text-xl">{event.title}</DialogTitle>
-          <DialogDescription className="mt-2">
+          <DialogTitle className="text-xl text-gray-900 dark:text-gray-100">{event.title}</DialogTitle>
+          <DialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
             {event.description}
           </DialogDescription>
         </DialogHeader>
@@ -95,9 +95,9 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
         <div className="space-y-4 my-4">
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <Clock className="h-4 w-4 text-gray-500" />
+              <Clock className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <div>
-                <div className="font-medium">
+                <div className="font-medium text-gray-900 dark:text-gray-100">
                   {event.startDate.toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
@@ -105,7 +105,7 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
                     day: 'numeric'
                   })}
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600 dark:text-gray-400">
                   {event.startDate.toLocaleTimeString('en-US', {
                     hour: 'numeric',
                     minute: '2-digit',
@@ -123,18 +123,18 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
             {metadata && (
               <>
                 <div className="flex items-center gap-3 text-sm">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <span>{metadata.location}</span>
+                  <MapPin className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-gray-900 dark:text-gray-100">{metadata.location}</span>
                 </div>
                 
                 <div className="flex items-center gap-3 text-sm">
-                  <Building2 className="h-4 w-4 text-gray-500" />
-                  <span>{metadata.organization}</span>
+                  <Building2 className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-gray-900 dark:text-gray-100">{metadata.organization}</span>
                 </div>
                 
                 <div className="flex items-center gap-3 text-sm">
-                  <DollarSign className="h-4 w-4 text-gray-500" />
-                  <span>{metadata.cost}</span>
+                  <DollarSign className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-gray-900 dark:text-gray-100">{metadata.cost}</span>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
                     {metadata.category.charAt(0).toUpperCase() + metadata.category.slice(1)}
                   </Badge>
                   {metadata.registrationRequired && (
-                    <Badge variant="outline">Registration Required</Badge>
+                    <Badge variant="outline" className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">Registration Required</Badge>
                   )}
                 </div>
               </>
@@ -151,7 +151,7 @@ export function EventDialog({ event, eventMetadata, open, onOpenChange }: EventD
         </div>
         
         <DialogFooter className="flex-col sm:flex-col gap-2">
-          <div className="text-sm text-gray-500 mb-2">Add to your calendar:</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Add to your calendar:</div>
           <div className="flex gap-2 w-full">
             <Button
               variant="outline"

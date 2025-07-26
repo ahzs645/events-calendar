@@ -7,9 +7,10 @@ import type { Event, EventMetadata } from "@/types";
 interface MobileMonthViewProps {
   events: Event[];
   eventMetadata: Record<string, EventMetadata>;
+  onEventClick?: (event: Event) => void;
 }
 
-export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps) {
+export function MobileMonthView({ events, eventMetadata, onEventClick }: MobileMonthViewProps) {
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = React.useState<Date>(new Date());
   
@@ -71,7 +72,7 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
             Prev
           </Button>
           
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </h3>
           
@@ -88,7 +89,7 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
         {/* Calendar grid */}
         <div className="grid grid-cols-7 gap-1 mb-4">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-sm font-medium py-2 text-gray-600">
+            <div key={day} className="text-center text-sm font-medium py-2 text-gray-600 dark:text-gray-400">
               {day}
             </div>
           ))}
@@ -106,10 +107,10 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
                 key={index}
                 onClick={() => setSelectedDate(day)}
                 className={`
-                  p-2 text-sm rounded hover:bg-gray-100 transition-colors
-                  ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
+                  p-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
+                  ${isCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}
                   ${isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
-                  ${isToday && !isSelected ? 'bg-gray-200 font-semibold' : ''}
+                  ${isToday && !isSelected ? 'bg-gray-200 dark:bg-gray-700 font-semibold' : ''}
                 `}
               >
                 {day.getDate()}
@@ -120,7 +121,7 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-3 border-t px-4 !pt-4">
         <div className="flex w-full items-center justify-between px-1">
-          <div className="text-sm font-medium">
+          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {selectedDate?.toLocaleDateString("en-US", {
               day: "numeric",
               month: "long",
@@ -130,7 +131,7 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
         </div>
         <div className="flex w-full flex-col gap-2">
           {selectedDateEvents.length === 0 ? (
-            <div className="text-sm text-gray-500 text-center py-4">
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
               No events on this day
             </div>
           ) : (
@@ -149,16 +150,17 @@ export function MobileMonthView({ events, eventMetadata }: MobileMonthViewProps)
               const categoryColor = metadata ? categoryColors[metadata.category as keyof typeof categoryColors] : "after:bg-gray-500";
 
               return (
-                <div
+                <button
                   key={event.id}
-                  className={`bg-muted relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full ${categoryColor}`}
+                  className={`bg-muted dark:bg-gray-700 relative rounded-md p-2 pl-6 text-sm text-left w-full after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${categoryColor}`}
+                  onClick={() => onEventClick?.(event)}
                 >
-                  <div className="font-medium">{event.title}</div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="font-medium text-gray-900 dark:text-gray-100">{event.title}</div>
+                  <div className="text-muted-foreground dark:text-gray-400 text-xs">
                     {formatTime(event.startDate)} - {formatTime(event.endDate)}
                     {metadata && ` • ${metadata.location}`}
                   </div>
-                </div>
+                </button>
               );
             })
           )}

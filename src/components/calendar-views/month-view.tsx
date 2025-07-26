@@ -108,19 +108,19 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl my-5 tracking-tighter font-bold"
+          className="text-3xl my-5 tracking-tighter font-bold text-gray-900 dark:text-gray-100"
         >
           {currentDate.toLocaleString("default", { month: "long" })}{" "}
           {currentDate.getFullYear()}
         </motion.h2>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handlePrevMonth}>
-            <ArrowLeft />
+          <Button variant="outline" onClick={handlePrevMonth} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
             Prev
           </Button>
-          <Button variant="outline" onClick={handleNextMonth}>
+          <Button variant="outline" onClick={handleNextMonth} className="gap-2">
             Next
-            <ArrowRight />
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -138,7 +138,7 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
           {daysOfWeek.map((day, idx) => (
             <div
               key={idx}
-              className="text-left my-8 text-4xl tracking-tighter font-medium"
+              className="text-left my-8 text-4xl tracking-tighter font-medium text-gray-900 dark:text-gray-100"
             >
               {day}
             </div>
@@ -146,7 +146,7 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
 
           {Array.from({ length: startOffset }).map((_, idx) => (
             <div key={`offset-${idx}`} className="h-[150px] opacity-50">
-              <div className="font-semibold relative text-3xl mb-1">
+              <div className="font-semibold relative text-3xl mb-1 text-gray-400 dark:text-gray-500">
                 {lastDateOfPrevMonth - startOffset + idx + 1}
               </div>
             </div>
@@ -173,11 +173,15 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
                 onMouseLeave={() => setHoveredDay(null)}
               >
                 <Card 
-                  className="shadow-md overflow-hidden relative flex p-4 border h-full cursor-pointer hover:shadow-lg transition-shadow day-card"
-                  onClick={() => onDateClick?.(new Date(currentDate.getFullYear(), currentDate.getMonth(), dayObj.day))}
+                  className={`shadow-md overflow-hidden relative flex p-4 border h-full transition-shadow day-card ${
+                    dayEvents.length > 0 
+                      ? "cursor-pointer hover:shadow-lg" 
+                      : "cursor-default"
+                  }`}
+                  onClick={dayEvents.length > 0 ? () => onDateClick?.(new Date(currentDate.getFullYear(), currentDate.getMonth(), dayObj.day)) : undefined}
                 >
                   <div className={`font-semibold relative text-3xl mb-1 ${
-                    dayEvents.length > 0 ? "text-black" : "text-gray-500"
+                    dayEvents.length > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"
                   } ${isToday ? "text-secondary-500" : ""}`}>
                     {dayObj.day}
                   </div>
@@ -200,10 +204,14 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
                 
                 {/* Hover Tooltip */}
                 {hoveredDay === dayObj.day && dayEvents.length > 0 && (
-                  <div className={`absolute top-full mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 w-80 ${
-                    isRightEdge ? 'right-0' : 'left-0'
-                  }`}>
-                    <div className="text-sm font-semibold text-gray-900 mb-2">
+                  <div 
+                    className={`absolute top-full z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 w-80 ${
+                      isRightEdge ? 'right-0' : 'left-0'
+                    }`}
+                    onMouseEnter={() => setHoveredDay(dayObj.day)}
+                    onMouseLeave={() => setHoveredDay(null)}
+                  >
+                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                       {dayEvents.length} event{dayEvents.length > 1 ? 's' : ''}
                     </div>
                     <div className="space-y-2">
@@ -224,7 +232,7 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
                         return (
                           <div 
                             key={event.id} 
-                            className="flex items-start gap-2 p-1 -m-1 rounded cursor-pointer hover:bg-gray-50 transition-colors"
+                            className="flex items-start gap-2 p-1 -m-1 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               onEventClick?.(event);
@@ -232,10 +240,10 @@ export function MonthView({ events, eventMetadata, onDateClick, onEventClick }: 
                           >
                             <div className={`w-2 h-2 rounded-full ${colorClass} flex-shrink-0 mt-1.5`}></div>
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm text-gray-800 leading-tight">
+                              <div className="font-medium text-sm text-gray-800 dark:text-gray-200 leading-tight">
                                 {event.title}
                               </div>
-                              <div className="text-xs text-gray-600 mt-0.5">
+                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
                                 {formatTime(event.startDate)}
                               </div>
                             </div>

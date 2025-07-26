@@ -6,9 +6,10 @@ import type { Event, EventMetadata } from "@/types";
 interface ListViewProps {
   events: Event[];
   eventMetadata: Record<string, EventMetadata>;
+  onEventClick?: (event: Event) => void;
 }
 
-export function EventListView({ events, eventMetadata }: ListViewProps) {
+export function EventListView({ events, eventMetadata, onEventClick }: ListViewProps) {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -32,7 +33,7 @@ export function EventListView({ events, eventMetadata }: ListViewProps) {
   return (
     <div className="space-y-6">
       {sortedEvents.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <CalendarDays className="mx-auto h-12 w-12 mb-4 opacity-50" />
           <h3 className="text-lg font-medium mb-2">No events found</h3>
           <p>Try adjusting your filters to see more events.</p>
@@ -57,9 +58,9 @@ export function EventListView({ events, eventMetadata }: ListViewProps) {
             <div key={dateKey} className="space-y-3">
               {/* Date Header */}
               <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold text-gray-900">{dateLabel}</h3>
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{dateLabel}</h3>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600"></div>
+                <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
                   {dateEvents.length} event{dateEvents.length > 1 ? 's' : ''}
                 </span>
               </div>
@@ -83,27 +84,28 @@ export function EventListView({ events, eventMetadata }: ListViewProps) {
                   return (
                     <div
                       key={event.id}
-                      className={`bg-muted relative rounded-md p-3 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full ${categoryColor}`}
+                      className={`bg-muted dark:bg-gray-700 relative rounded-md p-3 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${categoryColor}`}
+                      onClick={() => onEventClick?.(event)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-grow min-w-0">
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-muted-foreground text-xs mt-1">
+                          <div className="font-medium text-gray-900 dark:text-gray-100">{event.title}</div>
+                          <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                             {formatTime(event.startDate)} - {formatTime(event.endDate)}
                           </div>
                           {metadata && (
-                            <div className="text-muted-foreground text-xs mt-1">
+                            <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                               {metadata.location}
                             </div>
                           )}
                           {metadata && (
-                            <div className="text-muted-foreground text-xs mt-1">
+                            <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                               {metadata.organization}
                             </div>
                           )}
                         </div>
                         {metadata && (
-                          <div className="text-sm font-semibold text-green-600 flex-shrink-0 ml-2">
+                          <div className="text-sm font-semibold text-green-600 dark:text-green-400 flex-shrink-0 ml-2">
                             {metadata.cost}
                           </div>
                         )}
@@ -125,7 +127,7 @@ export function EventListView({ events, eventMetadata }: ListViewProps) {
   );
 }
 
-export function MobileListView({ events, eventMetadata }: ListViewProps) {
+export function MobileListView({ events, eventMetadata, onEventClick }: ListViewProps) {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -149,7 +151,7 @@ export function MobileListView({ events, eventMetadata }: ListViewProps) {
   return (
     <div className="space-y-6">
       {sortedEvents.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <CalendarDays className="mx-auto h-12 w-12 mb-4 opacity-50" />
           <h3 className="text-lg font-medium mb-2">No events found</h3>
           <p>Try adjusting your filters to see more events.</p>
@@ -174,9 +176,9 @@ export function MobileListView({ events, eventMetadata }: ListViewProps) {
             <div key={dateKey} className="space-y-3">
               {/* Date Header */}
               <div className="flex items-center gap-3">
-                <h3 className="text-base font-semibold text-gray-900">{dateLabel}</h3>
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{dateLabel}</h3>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-600"></div>
+                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
                   {dateEvents.length}
                 </span>
               </div>
@@ -200,27 +202,28 @@ export function MobileListView({ events, eventMetadata }: ListViewProps) {
                   return (
                     <div
                       key={event.id}
-                      className={`bg-muted relative rounded-md p-3 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full ${categoryColor}`}
+                      className={`bg-muted dark:bg-gray-700 relative rounded-md p-3 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${categoryColor}`}
+                      onClick={() => onEventClick?.(event)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-grow min-w-0">
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-muted-foreground text-xs mt-1">
+                          <div className="font-medium text-gray-900 dark:text-gray-100">{event.title}</div>
+                          <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                             {formatTime(event.startDate)} - {formatTime(event.endDate)}
                           </div>
                           {metadata && (
-                            <div className="text-muted-foreground text-xs mt-1">
+                            <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                               {metadata.location}
                             </div>
                           )}
                           {metadata && (
-                            <div className="text-muted-foreground text-xs mt-1">
+                            <div className="text-muted-foreground dark:text-gray-400 text-xs mt-1">
                               {metadata.organization}
                             </div>
                           )}
                         </div>
                         {metadata && (
-                          <div className="text-sm font-semibold text-green-600 flex-shrink-0 ml-2">
+                          <div className="text-sm font-semibold text-green-600 dark:text-green-400 flex-shrink-0 ml-2">
                             {metadata.cost}
                           </div>
                         )}
