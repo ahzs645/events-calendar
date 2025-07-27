@@ -152,12 +152,6 @@ export default function UNBCCalendar() {
             )}
           </button>
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-2">
-          🗓️ UNBC Campus Events
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-lg">
-          Discover what's happening at UNBC - from academic workshops to social gatherings, all in one place
-        </p>
       </div>
 
       {/* Event Statistics */}
