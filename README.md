@@ -1,158 +1,119 @@
-# UNBC Campus Events Calendar
+# UNBC Events Calendar - ReactPress Version
 
-A standalone React/Next.js application for displaying UNBC campus events with multiple view modes and filtering capabilities.
+This is a ReactPress-compatible version of the UNBC Events Calendar that can be easily integrated into WordPress using the ReactPress plugin.
 
 ## Features
 
-- **Multiple Views**: Month, Week, Day, and List views
-- **Event Filtering**: Filter by category, organization, or search terms
-- **Event Statistics**: Quick overview of total events, weekly events, free events, and events requiring registration
-- **Responsive Design**: Works on desktop and mobile devices
-- **Category Color Coding**: Visual distinction between different event types
+✅ **Full React Calendar**: All features from your original calendar
+✅ **ReactPress Compatible**: Works seamlessly with ReactPress plugin
+✅ **WordPress Integration**: Can optionally fetch events from WordPress REST API
+✅ **Vite Build System**: Fast development with HMR
+✅ **Tailwind CSS**: Modern styling with dark mode
+✅ **TypeScript Ready**: Full type support
 
-## Event Categories
+## Installation with ReactPress
 
-- **Academic** (Green): Lectures, workshops, study groups
-- **Social** (Orange): Parties, mixers, social events
-- **Cultural** (Purple): Cultural celebrations, diversity events
-- **Sports & Recreation** (Red): Athletic events, outdoor activities
-- **Professional** (Teal): Career fairs, networking events
-- **Health & Wellness** (Blue): Mental health, fitness, yoga
-- **Volunteer** (Yellow): Community service, volunteer opportunities
-- **Arts & Creative** (Pink): Art exhibitions, creative workshops
+### 1. Install ReactPress Plugin
 
-## Getting Started
+1. In WordPress admin, go to Plugins → Add New
+2. Search for "ReactPress"
+3. Install and activate the plugin
 
-### Prerequisites
+### 2. Add Your Calendar App
 
-- Node.js 18+ 
-- npm or yarn
+1. Copy this folder to:
+   ```
+   /wp-content/reactpress/apps/unbc-calendar/
+   ```
 
-### Installation
-
-1. Clone or extract the calendar directory
 2. Install dependencies:
+   ```bash
+   cd /wp-content/reactpress/apps/unbc-calendar
+   npm install
+   ```
 
-```bash
-npm install
-# or
-yarn install
-```
+3. Go to ReactPress admin page in WordPress
+4. You should see "unbc-calendar" in the apps list
+5. Select a target page or create a new one
+6. Click "Update Dev-Environment"
 
-### Development
-
-Run the development server:
+### 3. Development
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Visit http://localhost:5173 to see your calendar with WordPress theme.
 
-### Building for Production
+### 4. Build for Production
 
 ```bash
 npm run build
-npm start
 ```
 
-## Project Structure
+The calendar will now be visible on your WordPress page.
 
-```
-unbc-events-calendar/
-├── src/
-│   ├── app/                 # Next.js app directory
-│   │   ├── layout.tsx       # Root layout
-│   │   └── page.tsx         # Home page
-│   ├── components/
-│   │   ├── ui/              # Basic UI components
-│   │   └── unbc-calendar.tsx # Main calendar component
-│   ├── lib/
-│   │   └── utils.ts         # Utility functions
-│   ├── styles/
-│   │   └── globals.css      # Global styles
-│   └── types/
-│       └── index.ts         # TypeScript types
-├── package.json
-└── README.md
-```
+## Using WordPress Data
+
+To use events from WordPress instead of demo data:
+
+1. Edit `src/App.jsx`:
+   ```jsx
+   import UNBCCalendarWordPress from './components/unbc-calendar-wordpress'
+   
+   function App() {
+     return (
+       <div className="container mx-auto px-4">
+         <UNBCCalendarWordPress />
+       </div>
+     )
+   }
+   ```
+
+2. Edit `src/components/unbc-calendar-wordpress.jsx`:
+   ```jsx
+   const USE_WORDPRESS_DATA = true; // Enable WordPress data
+   ```
+
+3. Make sure you have events custom post type with these meta fields:
+   - `event_date`
+   - `event_time`
+   - `event_end_date`
+   - `event_location`
+   - `event_category`
+   - `event_organization`
+   - `event_registration_url`
 
 ## Customization
 
-### Adding Events
-
-Events are currently defined in the `unbcEvents` array in `src/components/unbc-calendar.tsx`. To add new events:
-
-```typescript
-{
-  id: "unique-id",
-  title: "Event Title",
-  description: "Event description",
-  startDate: new Date(year, month, day, hour, minute),
-  endDate: new Date(year, month, day, hour, minute),
-  variant: "success" | "primary" | "default" | "warning" | "danger"
-}
-```
-
-Don't forget to add corresponding metadata in the `eventMetadata` object:
-
-```typescript
-"unique-id": {
-  category: "academic",
-  organization: "Organization Name",
-  location: "Event Location",
-  cost: "Free" | "$X",
-  registrationRequired: true | false,
-  posterUrl: "optional-image-url"
-}
-```
-
-### Modifying Categories
-
-To add or modify event categories:
-
-1. Update the `EventCategory` type in `src/types/index.ts`
-2. Add color mappings in the component's `categoryColors` objects
-3. Update the legend in the main component
-
 ### Styling
+- Edit `src/index.css` for global styles
+- Components use Tailwind CSS classes
+- Dark mode is fully supported
 
-The application uses Tailwind CSS for styling. Modify styles in:
-- `src/styles/globals.css` for global styles
-- Component files for component-specific styles
-- `tailwind.config.js` for theme customization
+### Components
+- All components are in `src/components/`
+- Calendar views are in `src/components/calendar-views/`
+- UI components use Radix UI primitives
 
-## Technologies Used
+## Deployment
 
-- **Next.js 14** - React framework
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Framer Motion** - Animations
-- **Lucide React** - Icons
-- **date-fns** - Date utilities
+1. Build the app:
+   ```bash
+   npm run build
+   ```
 
-## Integration with WordPress
+2. On your production server:
+   - Install ReactPress
+   - Create the same app folder structure
+   - Upload only the `build` folder
+   - Configure the same page in ReactPress admin
 
-This standalone version can be integrated with WordPress by:
+## Benefits over Custom Plugin
 
-1. Creating a WordPress plugin that provides event data via REST API
-2. Replacing the static `unbcEvents` array with API calls
-3. Adding authentication for event management
-4. Creating custom post types for events with the required fields
-
-## Contributing
-
-To contribute to this project:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is intended for UNBC internal use.
+- ✅ No WordPress plugin development needed
+- ✅ Standard React development workflow
+- ✅ Automatic WordPress theme integration
+- ✅ Easy deployment process
+- ✅ Full control over React app
+- ✅ Works with any WordPress theme
